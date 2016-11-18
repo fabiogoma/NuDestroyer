@@ -1,4 +1,4 @@
-package destroyer;
+package br.com.nubank.destroyer;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 
-public class Listener {
-	private static Logger logger = Logger.getLogger(Listener.class);
+public class DestroyerListener {
+	private static Logger logger = Logger.getLogger(DestroyerListener.class);
 	
 	public static void main(String[] args) throws InterruptedException {
 		AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
