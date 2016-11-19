@@ -11,6 +11,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.CancelSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
@@ -21,21 +22,31 @@ import br.com.nubank.destroyer.pojos.Job;
 public class Destroyer {
 	private static Logger logger = Logger.getLogger(Destroyer.class);
 	
-	public void Destroy(String instanceId) {
+	public void Destroy(Job job) {
 		
 		List<String> instanceIds = new ArrayList<String>();
+		List<String> requestIds = new ArrayList<String>();
 		
-		if (instanceId != null){
-			instanceIds.add(instanceId);
+		if (job.getInstanceId() != null){
+			instanceIds.add(job.getInstanceId());
+			requestIds.add(job.getRequestId());
 			
-			logger.info("Terminate Instance: " + instanceId);
+			logger.info("Terminate Instance: " + job.getInstanceId());
+			logger.info("Cancel Spot Instance Request: " + job.getRequestId());
 			try {
 				AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
 				AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
-	
+				
+				//Terminate instance
 			    TerminateInstancesRequest terminateRequest = new TerminateInstancesRequest(instanceIds);
 			    ec2.terminateInstances(terminateRequest);
-			    updateStatus(credentials, instanceId);
+			    
+			    //Cancel Spot Instance Request
+			    CancelSpotInstanceRequestsRequest cancelRequest = new CancelSpotInstanceRequestsRequest(requestIds);
+			    ec2.cancelSpotInstanceRequests(cancelRequest);
+			    
+			    updateStatus(credentials, job);
+			    
 			} catch (AmazonServiceException e) {
 			    logger.error("Error terminating instances");
 			    logger.error("Caught Exception: " + e.getMessage());
@@ -46,13 +57,10 @@ public class Destroyer {
 		}
 	}
 	
-	private void updateStatus(AWSCredentials credentials, String instanceId){		
+	private void updateStatus(AWSCredentials credentials, Job job){		
 		logger.info("Sending message to queue sqs_update");
         AmazonSQS sqs = new AmazonSQSClient(credentials);
         
-		Job job = new Job();
-		job.setInstanceId(instanceId);
-		job.setSchedule("");
 		job.setStatus("terminated");
         
         JSONObject jobJson = new JSONObject(job);

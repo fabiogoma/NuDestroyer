@@ -3,6 +3,7 @@ package br.com.nubank.destroyer;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -11,6 +12,8 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+
+import br.com.nubank.destroyer.pojos.Job;
 
 public class DestroyerListener {
 	private static Logger logger = Logger.getLogger(DestroyerListener.class);
@@ -27,8 +30,17 @@ public class DestroyerListener {
         	List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
 	        for (Message message : messages) {
 	        	
+	        	JSONObject jsonObject = new JSONObject(message.getBody());
+	        	
+	        	Job job = new Job();
+	        	
+	        	job.setInstanceId(jsonObject.getString("instanceId"));
+	        	job.setRequestId(jsonObject.getString("requestId"));
+	        	job.setSchedule(jsonObject.getString("schedule"));
+	        	job.setStatus(jsonObject.getString("status"));
+	        	
 	        	Destroyer destroyer = new Destroyer();
-	        	destroyer.Destroy(message.getBody().toString());
+	        	destroyer.Destroy(job);
 	        	
 	        	String messageRecieptHandle = messages.get(0).getReceiptHandle();
 	        	sqs.deleteMessage(new DeleteMessageRequest(myQueueUrl, messageRecieptHandle));
