@@ -1,2 +1,3 @@
-destroyer/Destroyer.class
-destroyer/Listener.class
+br/com/nubank/destroyer/pojos/Job.class
+br/com/nubank/destroyer/DestroyerListener.class
+br/com/nubank/destroyer/Destroyer.class

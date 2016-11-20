@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.CancelSpotInstanceRequestsRequest;
@@ -34,8 +34,8 @@ public class Destroyer {
 			logger.info("Terminate Instance: " + job.getInstanceId());
 			logger.info("Cancel Spot Instance Request: " + job.getRequestId());
 			try {
-				AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
-				AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
+				AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
+				AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withRegion(System.getenv("REGION")).build();
 				
 				//Terminate instance
 			    TerminateInstancesRequest terminateRequest = new TerminateInstancesRequest(instanceIds);
@@ -65,6 +65,6 @@ public class Destroyer {
         
         JSONObject jobJson = new JSONObject(job);
         
-		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_update", jobJson.toString()));
+		sqs.sendMessage(new SendMessageRequest(System.getenv("SQS_UPDATE_URL"), jobJson.toString()));
 	}
 }

@@ -1,2 +1,3 @@
-/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nudestroyer/src/main/java/destroyer/Destroyer.java
-/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nudestroyer/src/main/java/destroyer/Listener.java
+/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nudestroyer/src/main/java/br/com/nubank/destroyer/pojos/Job.java
+/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nudestroyer/src/main/java/br/com/nubank/destroyer/DestroyerListener.java
+/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nudestroyer/src/main/java/br/com/nubank/destroyer/Destroyer.java
